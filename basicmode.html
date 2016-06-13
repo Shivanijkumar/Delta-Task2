@@ -1,0 +1,131 @@
+<html>
+<head>
+</head>
+<body>
+<button onClick="startGame()">Start</button>
+<p><b>Use the Up arrow key to jump</b></p>
+<canvas id="canvas" width="480" height="270" style="border:thin solid black;">
+</canvas>
+<script>
+var score=0;
+var a=10;
+var b=240;
+var GamePiece;
+var Obstacles = [];
+window.addEventListener("keydown",myfunc,true);
+function startGame() {
+    GamePiece = new create(30, 30, "lightblue", 10, 240);
+    myGameArea.start();
+}
+
+function drawscore()
+{
+
+score=myGameArea.frameNo;
+ctx.font="20px Arial";
+ctx.fillStyle="black";
+ctx.fillText("Score:"+score,300,25);
+}
+var myGameArea = {
+    start : function() {
+         this.canvas=document.getElementById("canvas");
+        this.context = this.canvas.getContext("2d");
+        this.frameNo = 0;
+
+        this.interval = setInterval('updateGameArea()', 4);
+        },
+    clear : function() {
+        this.context.clearRect(0, 0, 480, 270);
+    },
+    stop : function() {
+        
+      ctx.font = "40px Arial";
+      ctx.fillStyle="black";
+      ctx.fillText("GAME OVER!!",110,150);
+      clearInterval(this.interval);
+
+    }
+}
+
+function create(width, height, color, x, y) {
+    this.width = width;
+    this.height = height; 
+    this.x = x;
+    this.y = y;    
+    this.update = function() {
+   ctx = myGameArea.context;
+   ctx.fillStyle = color;
+   ctx.fillRect(this.x, this.y, this.width, this.height);
+   drawscore();
+    }
+   this.crashWith = function(obs) {
+        var objleft = this.x;
+        var objright = this.x + (this.width);
+        var objtop = this.y;
+        var objbottom = this.y + (this.height);
+        var obsleft = obs.x;
+        var obsright = obs.x + (obs.width);
+        var obstop = obs.y;
+        var obsbottom = obs.y + (obs.height);
+
+        var crash = true;
+        if ((objbottom < obstop) || (objright < obsleft) || (objleft > obsright) || (objbottom==obstop)) {
+            crash = false;
+           
+        }
+      
+        return crash;
+    }
+}
+
+function updateGameArea() {
+    var x,y;
+ var u=250;
+var v=220;
+
+    for (i = 0; i<Obstacles.length; i += 1) {
+        if (GamePiece.crashWith(Obstacles[i])) {
+            myGameArea.stop();
+       return;
+        } 
+    }
+    myGameArea.clear();
+    myGameArea.frameNo += 1;
+    if (myGameArea.frameNo == 1 || everyinterval(300)) {
+        x = myGameArea.canvas.width;
+        y=Math.floor(Math.random()*(u-v+1)+v);
+   Obstacles.push(new create(10, 270, "purple", x, y));
+    }
+    for (i = 0; i < Obstacles.length; i += 1) {
+        Obstacles[i].x += -1;
+        Obstacles[i].update();
+    }
+    GamePiece.update();
+}
+
+function everyinterval(n) {
+    if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
+    return false;
+}
+function myfunc(e)
+{ 
+var z = e.which || e.keyCode;
+if(z==38)
+{
+ a=a;
+b=b-100;
+}
+if(b<0)
+b=0;
+GamePiece=new create(30,30,"lightblue",a,b);
+var s=setTimeout('land()',300);
+}
+function land()
+{
+a=a;
+b=b+100;
+GamePiece=new create(30,30,"lightblue",a,b);
+}
+</script>
+</body>
+</html>
